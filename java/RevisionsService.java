@@ -1,4 +1,4 @@
-package com.infoniqa.one.ddp.onboarding.audit;
+package com.infoniqa.one.ddp.onboarding.audit.java;
 
 import com.infoniqa.one.ddp.onboarding.audit.dto.RevisionRecord;
 
@@ -26,13 +26,13 @@ public class RevisionsService {
 
     private final RevisionsComparator revisionsComparator;
 
-    public List<RevisionRecord> createAuditReport(UUID employeeId) {
+    public List < RevisionRecord > createAuditReport(UUID employeeId) {
         log.debug("#createAuditReport: employeeId={}", employeeId);
-        List<RevisionRecord> revisionRecords = new ArrayList<>();
+        List < RevisionRecord > revisionRecords = new ArrayList < > ();
 
         try (EntityManager entityManager = entityManagerFactory.createEntityManager()) {
             AuditReader auditReader = AuditReaderFactory.get(entityManager);
-            List<Number> revisionNumbers = auditReader.getRevisions(Employee.class, employeeId);
+            List < Number > revisionNumbers = auditReader.getRevisions(Employee.class, employeeId);
             boolean hasSetDefaultAsPrevious = false;
             for (int i = 1; i < revisionNumbers.size(); i++) {
                 Number previousRevisionNumber = revisionNumbers.get(i - 1);
@@ -43,17 +43,17 @@ public class RevisionsService {
                 if (previousEmployee.getOnboardingStatus().equals(currentEmployee.getOnboardingStatus())) {
                     continue;
                 }
-                boolean shouldUseDefaultAsPrevious = previousEmployee.getOnboardingStatus().equals(OnboardingStatus.OPEN)
-                    && currentEmployee.getOnboardingStatus().equals(OnboardingStatus.SENT_TO_BPO)
-                    && !hasSetDefaultAsPrevious;
+                boolean shouldUseDefaultAsPrevious = previousEmployee.getOnboardingStatus().equals(OnboardingStatus.OPEN) &&
+                                                     currentEmployee.getOnboardingStatus().equals(OnboardingStatus.SENT_TO_BPO) &&
+                                                     !hasSetDefaultAsPrevious;
                 if (shouldUseDefaultAsPrevious) {
                     hasSetDefaultAsPrevious = true;
                 }
-                Set<RevisionRecord> differences = revisionsComparator.getEmployeesDeltasBetweenTransitions(
-                    previousEmployee,
-                    currentEmployee,
-                    shouldUseDefaultAsPrevious
-                );
+                Set < RevisionRecord > differences = revisionsComparator.getEmployeesDeltasBetweenTransitions(
+                        previousEmployee,
+                        currentEmployee,
+                        shouldUseDefaultAsPrevious
+                                                     );
                 revisionRecords.addAll(differences);
             }
         }
